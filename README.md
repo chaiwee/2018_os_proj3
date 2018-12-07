@@ -84,93 +84,96 @@ to read data on "/file1":
         1. calculate the first byte of data blocks
         2. copy of it
 
-———————————————————————————————————————————————————————————————————————————————————————————————————
+## Explanation
 
-## explination
+In this project, you will build a simple filesystem. You have to implement above-mentioned simple file-system with the proper assumptions.
 
-In this project, you will build a simple filesystem. You have to implement above-mentioned simple file system with the proper assumptions.
+This program assignment could be one of your major take-outs from this course, so please work hard to complete the job/semester. If you need help, please ask for the help. (I am here for that specific purpose.) I, of course, welcome any questions on the subject. Note for the one strict rule that you should not copy the code from any others. Deep discussion on the subject is okay (and encouraged), but the same code (or semantics) will result in a sad ending.
 
-Since this program assignment could be one of your major take-outs from this course, so please work hard to complete the job/semester. If you need help, please ask for the help. (I am here for that specific purpose.) I, of course, welcome any questions on the subject. Note for the one strict rule that you should not copy the code from any others. Deep discussion on the subject is okay (and encouraged), but the same code (or semantics) will result in the sad
-ending.
+Extra implementation/analysis is highly encouraged.
+For example, you can implement user process that requests of reading for some specific file, instead of doing simple I/O.
+You can implement file with write operation that requires storage block allocation for additional data, requiring i-node change.
+You may want to load directory-entry into memory because every file-access implies addition directory-file-access; and it will be redundant if you read data from storage at every directory-file-access, which would be one of slowest operations in a computer system.
+You may want to efficiently search directory entries because a directory may include many files. So, you would use a hash-map to easily get the inode from the requested file name.
 
-Extra implementation/analysis is highly encouraged. For example, you can implement user process that requests of reading for some specific file, instead of doing simple I/O. In addition, you can implement file with write operation that requires storage block allocation for additional data, requiring i-node change. You may want to load directory entry into memory because every file access implies addition directory file access; and it will be redundant if you read data from storage at every directory file access, which would be one of slowest operations in a computer system. You may want to efficiently search directory entries because a directory may include many files. So, you would use a hash map to easily get the inode from the requested file name.
-
-There are various topics related to the file systems, including I/O, scheduling, and virtual memory. Do as much as you can do, and learn from it. (if you need a specific guideline, I can give some.)
+There are various topics related to file-systems, including I/O, scheduling, and virtual-memory. Do as much as you can, and learn from it. (if you need a specific guideline, I can provide some.)
 
 Lastly, some advice: begin as early as possible. Ask for help as early as possible. Try as early as possible. They are for your happy ending.
 
-The followings are specific requirements for your program.
-1. The objective: understand file systems structure and organization.
-    A. The simulator has to work correctly. (should not break down, obtain exact data that you requested)
-    B. Support the following file operations: mount, open, read, close
-    C. You should be able to read at least one (normal) file (open, read, close), rather than directory files.
-2. You can assume the following structure or on your own data structure for  superblock, i-nodes, and data blocks.
-    A. You can use pre-built filesystem image (disk.img), based on the following
-    structure definitions
-———————————————————————————————————————————————————————————————————————————————————————————————————
-//code
-———————————————————————————————————————————————————————————————————————————————————————————————————
-3. Kernel mounts the root file system at system start:
-    A. At the booting time, the root file system (rootfs) has to be mounted.
-    B. Mounting rootfs populates all the files in the root directory, and load i-nodes from the disk image. Note that the capacity of a disk is so large that all the contents of a disk cannot be loaded into the memory.
-    C. When booting the system, kernel mounts the root file system, and prints the files in the root directory. (similar to ls -al)
-4. Single user file operations: open, read, close.
-    A. Assume a single child process.
-    B. The child process conducts only file operations. (open, read, close)
-    C. To access a file, we need to open the file before use it.
-    D. When a user opens a file, it requires two parameters: pathname and open mode(O_RD), and returns with the file descriptor
-        i. The kernel has to read the directory file and look up the i-node number for the corresponding file.
-        ii. PCB should have a data structure for the open file. (file structure)
-        iii. file structure should have a pointer to the corresponding i-node.
-    E. When a user reads a file, the user should provide three parameters: file descriptor, a buffer pointer, read data size.
-        i. File structure should have offset value, where the previous file operation has been stopped.
-        ii. The kernel has to calculate the logical block numbers to obtain raw data blocks.
-        iii. The kernel reads the disk"s physical data blocks.
+### requirements:
+* Objective: understand file systems structure and organization.
+    * The simulator has to work correctly. (should not break down, should obtain exact data that you requested)
+    * Support the following file operations: mount, open, read, close
+    * You should be able to read at least one (normal) file (open, read, close), rather than directory files.
+* You can assume the following (or your own) data structure for superblock, i-nodes, and data blocks.
+    * You can use pre-built filesystem image (disk.img), based on the following
+    structure definitions:
+    // look at code
+* Kernel mounts the root file-system at system start:
+    * At the booting time, the root-file-system (rootfs) has to be mounted.
+    * Mounting rootfs populates all the files in the root-directory, and load i-nodes from the disk-image. Note that the capacity of a disk is so large, so all the contents of a disk cannot be loaded into the memory.
+    * When booting the system, kernel mounts the root file system, and prints the files in the root-directory. (similar to ls -al)
+* Single user file operations: open, read, close.
+    * Assume a single child process.
+    * The child process conducts only file operations. (open, read, close)
+    * To access a file, we need to open the file before use it.
+    * When a user opens a file, it requires two parameters: pathname and open mode(O_RD), and returns with the file descriptor
+        * The kernel has to read the directory file and look up the i-node number for the corresponding file.
+        * PCB should have a data structure for the open file. (file structure)
+        * file structure should have a pointer to the corresponding i-node.
+    * When a user reads a file, the user should provide three parameters: file descriptor, a buffer pointer, read data size.
+        * File structure should have offset value, where the previous file operation has been stopped.
+        * The kernel has to calculate the logical block numbers to obtain raw data blocks.
+        * The kernel reads the disk"s physical data blocks.
         iv. Copy it to the user buffer
         v. return with actual read bytes.
-    F. When the read is completed, the user closes the file.
-    G. You may assume one user process for this project, and read text data from randomly chosen ten files.
-        i. Look at the directory file for the file names.
-5. Extra implementation (directory entry cache/hash)
-    A. Directory files are one of the most frequently used files because all the files operations require directory access. Thus, you can cache the directory structure inside the memory, as well as disk.
-    B. To quickly access the correct directory entry, we can make an in-memory hash function for the directory structure. For example, we can make a hash function that takes keys from the file name, and generate value with the i-node pointer.
-    C. Because hash keys are smaller than the actual file names (space), you should check once again for exact file name match.
-6. Extra implementation (write operation)
-    A. You can simulate implement file write operation. To write to a file, you should provide data, along with the file pointer. If you are writing data to a file, the data is written from the beginning of the file.
-    B. You may need to consider data block allocation if the writing data size is over the data block boundary. In the case, you have to allocate a new data block from a free data block pool, and write it to i-node. Then, you should write data on the block.
-    C. After writing, you should be able to read data after the proper close operation.
-    D. Indirection blocks access to large files can also be considered.
-7. Extra implementation (Buffer cache)
-    A. To read-in data from disk, OS should prepare free memory region (free page)
-    B. You can link the disk operation with virtual memory free page.
-    C. When you read-in data, prepare free page frame that can store disk storage block.
-    D. The page frame can hold data in the storage, serving as a disk cache.
-    E. Then, you can read data from the buffer cache, instead of disk.
-    F. Because buffer cache is a cache to a disk, disk content would be different from the buffer cache. You should have a proper synchronization mechanism.
-8. Extra implementation (Make disk image creation tool)
-    A. A disk image file contains the raw image of a disk partition: superblock, inode table, data block.
-        iv. you can use the following definitions, or you can define your own structure
-    B. Files population in a disk image.
-        v. You can give input file names or directory.
-        vi. You can randomly generate filenames, contents.
-    C. Your kernel should be able to mount the disk image from your tool.
-    D. Output disk image is stored on file "disk.img."
-    E. Your file system would populate files named with file_[n] so that you can easily generate random file names.
-9. Extra implementation (work with multiple users)
-    A. When there are multiple users, file access should be properly managed by the kernel. Because our previous simulator allows multiple user processes, you can take control with it.
-    B. Each PCB should hold open file descriptor structure.
-    C. When a user tries to open a file, that is being used by another process; you have two choices.
-        i. Return failure for open syscall.
-        ii. Make the process wait until the previous user closes the file, and the file is available again.
-10. Output:
-    A. disk image tool (mk_simplefs disk.img …) :
-        i. prints out all the files information,
-        ii. prints out all the superblock, i-nodes table
-    B. You can assume single user process or multiple user processes:
-        i. A user process makes open/read/close file operations pair for 10 random files
-    ii. A user process prints out each file operations, and file contents on the screen
-    C. When you added write operation,
-        i. A user process makes open/[read|write]/close file operations for random files
-        ii. Kernel prints out all file operations (pid, file op, result with content)
-11. Evaluation:
-    A. Different credits are given for implementations and demos.
+    * When the read is completed, the user closes the file.
+    * You may assume one user process for this project, and read text data from randomly chosen ten files.
+        * Look at the directory file for the file names.
+
+* Output:
+    * disk image tool (mk_simplefs disk.img …) :
+        * prints out all the files information,
+        * prints out all the superblock, i-nodes table
+    * You can assume single user process or multiple user processes:
+        * A user process makes open/read/close file operations pair for 10 random files
+        * A user process prints out each file operations, and file contents on the screen
+    * When you added write operation,
+        * A user process makes open/[read|write]/close file operations for random files
+        * Kernel prints out all file operations (pid, file op, result with content)
+
+### Extra implementation
+* directory entry cache/hash
+    * Directory files are one of the most frequently used files because all the files operations require directory access. Thus, you can cache the directory structure inside the memory, as well as disk.
+    * To quickly access the correct directory entry, we can make an in-memory hash function for the directory structure. For example, we can make a hash function that takes keys from the file name, and generate value with the i-node pointer.
+    * Because hash keys are smaller than the actual file names (space), you should check once again for exact file name match.
+* write operation
+    * You can simulate implement file write operation. To write to a file, you should provide data, along with the file pointer. If you are writing data to a file, the data is written from the beginning of the file.
+    * You may need to consider data block allocation if the writing data size is over the data block boundary. In the case, you have to allocate a new data block from a free data block pool, and write it to i-node. Then, you should write data on the block.
+    * After writing, you should be able to read data after the proper close operation.
+    * Indirection blocks access to large files can also be considered.
+* Buffer cache
+    * To read-in data from disk, OS should prepare free memory region (free page)
+    * You can link the disk operation with virtual memory free page.
+    * When you read-in data, prepare free page frame that can store disk storage block.
+    * The page frame can hold data in the storage, serving as a disk cache.
+    * Then, you can read data from the buffer cache, instead of disk.
+    * Because buffer cache is a cache to a disk, disk content would be different from the buffer cache. You should have a proper synchronization mechanism.
+* Make disk image creation tool
+    * A disk image file contains the raw image of a disk partition: superblock, inode table, data block.
+        * you can use the following definitions, or you can define your own structure
+    * Files population in a disk image.
+        * You can give input file names or directory.
+        * You can randomly generate filenames, contents.
+    * Your kernel should be able to mount the disk image from your tool.
+    * Output disk image is stored on file "disk.img."
+    * Your file system would populate files named with file_[n] so that you can easily generate random file names.
+* work with multiple users
+    * When there are multiple users, file access should be properly managed by the kernel. Because our previous simulator allows multiple user processes, you can take control with it.
+    * Each PCB should hold open file descriptor structure.
+    * When a user tries to open a file, that is being used by another process; you have two choices.
+        * Return failure for open syscall.
+        * Make the process wait until the previous user closes the file, and the file is available again.
+
+### Evaluation
+Different credits are given for implementations and demos.
