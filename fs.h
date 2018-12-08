@@ -1,8 +1,6 @@
 /* File system header (FS.H) */
 
-/**
-	Some Define values
-*/
+/** Some Define values */
 #define SIMPLE_PARTITION	0x1111
 
 #define INVALID_INODE			0
@@ -36,9 +34,7 @@
 	data blocks: 1KB blocks array (~4K)
 */
 
-/**
-  Super block structure
-*/
+/** Super block structure */
 struct super_block {
 	unsigned int partition_type;
 	unsigned int block_size;
@@ -56,9 +52,7 @@ struct super_block {
 	unsigned char padding[960]; //1024-64
 };
 
-/**
-  32 byte I-node structure
-*/
+/** 32 byte I-node structure */
 struct inode {
 	unsigned int mode; 		// reg. file, directory, dev., permissions
 	unsigned int locked; 	// opened for write
@@ -79,9 +73,7 @@ struct partition {
 	struct blocks data_blocks[4088]; //4096-8
 };
 
-/**
-  Directory entry structure
-*/
+/** Directory entry structure */
 struct dentry {
 	unsigned int inode;
 	unsigned int dir_length;
