@@ -16,6 +16,7 @@
 #define SIMPLE_PARTITION	0x1111 //4k
 
 #define INVALID_INODE			0
+//inode mode (file)
 #define INODE_MODE_AC_ALL		0x777
 #define INODE_MODE_AC_USER_R	0x001
 #define INODE_MODE_AC_USER_W	0x002
@@ -26,8 +27,7 @@
 #define INODE_MODE_AC_GRP_R		0x100
 #define INODE_MODE_AC_GRP_W		0x200
 #define INODE_MODE_AC_GRP_X		0x400
-
-//inode(file) tipes
+//inode mode (file)
 #define INODE_MODE_REG_FILE		0x10000
 #define INODE_MODE_DIR_FILE		0x20000
 #define INODE_MODE_DEV_FILE		0x40000
