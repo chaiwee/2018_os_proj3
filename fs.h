@@ -1,7 +1,19 @@
 /* File system header (FS.H) */
+/**
+  Partition structure
+	ASSUME: data block size: 1K
+
+	partition: 4MB
+
+	Superblock: 1KB
+	Inode table (32 bytes inode array) * 224 entries = 7KB
+	data blocks: 1KB blocks array (~4K)
+*/
 
 /** Some Define values */
-#define SIMPLE_PARTITION	0x1111
+#define BLOCK_SIZE				0x400 //1KB
+
+#define SIMPLE_PARTITION	0x1111 //4k
 
 #define INVALID_INODE			0
 #define INODE_MODE_AC_ALL		0x777
@@ -15,24 +27,14 @@
 #define INODE_MODE_AC_GRP_W		0x200
 #define INODE_MODE_AC_GRP_X		0x400
 
+//inode(file) tipes
 #define INODE_MODE_REG_FILE		0x10000
 #define INODE_MODE_DIR_FILE		0x20000
 #define INODE_MODE_DEV_FILE		0x40000
 
+//data-entry(file) tipes
 #define DENTRY_TYPE_REG_FILE	0x1
 #define DENTRY_TYPE_DIR_FILE	0x2
-
-#define BLOCK_SIZE				0x400
-/**
-  Partition structure
-	ASSUME: data block size: 1K
-
-	partition: 4MB
-
-	Superblock: 1KB
-	Inode table (32 bytes inode array) * 224 entries = 7KB
-	data blocks: 1KB blocks array (~4K)
-*/
 
 /** Super block structure */
 struct super_block {
@@ -44,12 +46,12 @@ struct super_block {
 	unsigned int num_inodes;
 	unsigned int num_inode_blocks;
 	unsigned int num_free_inodes;
-
 	unsigned int num_blocks;
+
 	unsigned int num_free_blocks;
 	unsigned int first_data_block;
 	char volume_name[24];
-	unsigned char padding[960]; //1024-64
+	unsigned char padding[960]; //1024-64 // empty space before i-node-T
 };
 
 /** 32 byte I-node structure */
@@ -84,5 +86,3 @@ struct dentry {
 		unsigned char n_pad[16][16];
 	};
 };
-
-
