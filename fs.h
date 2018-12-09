@@ -6,8 +6,8 @@
 	partition: 4MB
 
 	Superblock: 1KB
-	Inode table (32 bytes inode array) * 224 entries = 7KB
-	data blocks: 1KB blocks array (~4K)
+	Inode table 32-bytes-inode * 224 entries = 7KB
+	data blocks: 1KB-blocks array (~4K)
 */
 
 /** Some Define values */
@@ -41,7 +41,7 @@ struct super_block {
 	unsigned int partition_type;
 	unsigned int block_size;
 	unsigned int inode_size;
-	unsigned int first_inode;
+	unsigned int first_inode_block;
 
 	unsigned int num_inodes;
 	unsigned int num_inode_blocks;
