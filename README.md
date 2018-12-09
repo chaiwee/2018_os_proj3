@@ -29,8 +29,8 @@ For example
     String "file_1" is not directly-related to the content, "1234"
 To search a file with content "1234", you should know the name of it, the physical-blocks (locations of the file), access permission, the current offsets, etc.
 
-Inside OS, files are represented with some number, the number is used as an index-of-inode (i-node) data structure, that holds meta-data for a file.
-i-node has rich information about the file, like disk data-blocks locations, file-size, access-permission, etc. 
+Inside OS, files are represented with some number, the number is used as an index of inode (i-node) data structure, that holds meta-data for a file.
+i-node has rich information about the file (like disk data-block locations, file-size, access-permission, etc)
 When you request to open a file:
 1. OS looks up the corresponding i-node in the file system.
 2. invoking reading/writing operation on the disk block that is given by the i-node.
@@ -47,8 +47,11 @@ Thus, storage partition usually looks like this:
 [Superblock]-[i-node-table blocks]-[data blocks]
 
 Note that, the i-node table needs to be loaded into memory from storage.
-When OS boots up the system, root-file-system(the top-namespace) is mounted. Usually, root directory file is the "/" file.
-When OS mounts the root file system, OS reads the superblock from the disk, and it populates files in the system by reading i-nodes from disk into memory.
+When OS boots up the system
+    root-file-system(the top-most-namespace) is mounted. (Usually is "/")
+        OS reads the superblock from the disk
+        and it populates files in the system
+            by reading i-nodes, from disk into memory.
 
 ### hierarchy (directorys/folders)
 A directory is a special type of file that contains the list of all files in the same sub-directory.
@@ -110,11 +113,15 @@ Lastly, some advice: begin as early as possible. Ask for help as early as possib
 ### requirements:
 * Objective: understand file systems structure and organization.
     * The simulator has to work correctly. (should not break down, should obtain exact data that you requested)
-    * Support the following file operations: mount, open, read, close
-    * You should be able to read at least one (normal) file (open, read, close), rather than directory-files.
+    * Support the following file operations:
+        * mount
+        * open
+        * read
+        * close
+    * You should be able to read bouth normal-files and directory-files.
 * You can assume the following (or your own) data structure
-    * You can use pre-built filesystem image (disk.img), based on:
-        * // code: structures for superblock, i-nodes, and data blocks.
+    * /* code example: structures for superblock, i-nodes, and data blocks */
+    * filesystem image (disk.img) is based on that.
 * root-file-system(rootfs) mount
     * at system start/booting time rootfs has to be mounted.
     * populates all the files in the root-directory, and loads i-nodes from the disk-image.
@@ -154,13 +161,16 @@ Lastly, some advice: begin as early as possible. Ask for help as early as possib
         * Kernel prints out all file operations (pid, file op, result with content)
 
 ### Extra implementation
-* directory entry cache/hash
-    * Directory-files are one of the most frequently used files because all the files operations require directory access. Thus, you can cache the directory structure inside the memory, as well as disk.
-    * To quickly access the correct directory-entry, we can make an in-memory hash function for the directory-structure. For example, we can make a hash function that takes keys from the file name, and generate value with the i-node pointer.
-    * Because hash keys are smaller than the actual file names (space), you should check once again for exact file name match.
-* write operation
-    * To write to a file, you should provide data, along with the file pointer. If you are writing data to a file, the data is written from the beginning of the file.
-    * You may need to consider data block allocation if the writing data size is over the data block boundary.
+* directory-entry cache/hash
+    * Directory-files frequently used because all the file-operations require directory access.
+        * Thus, you can cache the directory-structure inside the memory, as well as disk.
+    * To quickly access the correct directory-entry, we can make an in-memory hash function for the directory-structure.
+        * For example, we can make a hash function that takes keys from the file-name, and generate a value with the i-node pointer.
+        * Because hash keys are smaller than the actual file names (space), you should check once again for exact file name match.
+* write operation (to a file)
+    * you should provide data and file pointer.
+    * the data is written from the beginning of the file.
+    * You may need to consider data-block allocation if the new data overflows the block boundary.
         * In that case:
             1. allocate a new data-block from a free-data-block-pool
             2. write data-block to i-node.
@@ -168,27 +178,27 @@ Lastly, some advice: begin as early as possible. Ask for help as early as possib
     * After writing, you should be able to read data after the proper close operation.
     * Indirection blocks access to large files can also be considered.
 * Buffer cache
-    * To read-in data from disk, OS should prepare free memory region (free page)
+    * To read-in data from disk, OS should prepare free-memory-region (free page)
     * You can link the disk operation with virtual-memory free page.
-    * When you read-in data, prepare free page frame that can store disk storage block.
+    * When you read-in data, prepare free-page frame that can store disk storage block.
     * The page frame can hold data in the storage, serving as a disk cache.
     * Then, you can read data from the buffer cache, instead of disk.
     * Because buffer cache is a cache to a disk, disk content would be different from the buffer cache. You should have a proper synchronization mechanism.
-* Make disk image creation tool
-    * A disk image file contains the raw image of a disk partition: superblock, inode table, data block.
+* disk-image creation tool
+    * A disk image file contains the raw image of a disk partition: superblock, inode-table, data block.
         * you can use the following definitions, or you can define your own structure
     * Files population in a disk image.
         * You can give input file names or directory.
         * You can randomly generate filenames, contents.
     * Your kernel should be able to mount the disk image from your tool.
-    * Output disk image is stored on file "disk.img."
-    * Your file system would populate files named with file_[n] so that you can easily generate random file names.
+    * Output disk-image is stored on file "disk.img."
+    * would populate files named with file_[n] so that you can generate random file names.
 * work with multiple users
-    * When there are multiple users, file access should be properly managed by the kernel. Because our previous simulator allows multiple user processes, you can take control with it.
-    * Each PCB should hold open file descriptor structure.
-    * When a user tries to open a file, that is being used by another process; you have two choices.
+    * file access should be managed by kernel.
+    * Each PCB should hold open-file descriptor structure.
+    * When a user tries to open a file that is being used, you have two choices:
         * Return failure for open syscall.
-        * Make the process wait until the previous user closes the file, and the file is available again.
+        * Make the process wait until the previous user closes the file.
 
 ### Evaluation
 Different credits are given for implementations and demos.

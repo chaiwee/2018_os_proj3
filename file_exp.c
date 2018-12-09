@@ -8,6 +8,7 @@ void mount_sb(struct super_block *spr_blk);
 void print_sb(struct super_block *spr_blk);
 void fix_sb(struct super_block *sb, FILE *storage);
 void read_input();
+void check_all_inode(unsigned int starting_point, unsigned int inode_size, unsigned int ending_point);
 FILE *open_image();
 
 //variables values
@@ -23,14 +24,16 @@ int main(int argc, char *argv[])
     storage = open_image();
     mount_sb(spr_blk);
     print_sb(spr_blk);
-    check_all_i_nd(spr_blk->block_size, spr_blk->first_inode_block);
+    unsigned int starting_point = spr_blk->block_size * spr_blk->first_inode_block;
+    unsigned int ending_point = spr_blk->block_size * spr_blk->first_data_block;
+    check_all_inode(starting_point, spr_blk->inode_size, ending_point);
     //read_input();
     fclose(storage);
 }
 
 /** this method is never the same, it is used to fix the image*/
 void fix_sb(struct super_block *sb, FILE *storage)
-{ 
+{
     printf("fixing superblock:\n");
     // modify values
 
@@ -65,6 +68,32 @@ void mount_sb(struct super_block *spr_blk) //read super block
     int size = sizeof(struct super_block) - sizeof(((struct super_block *)0)->padding); // calculating size without padding
     fread(spr_blk, size, 1, storage);
     return;
+}
+
+void check_all_inode(unsigned int starting_point, unsigned int inode_size, unsigned int ending_point)
+{
+    struct inode *ind;
+    int i = 1;
+
+    ending_point = starting_point + (32 * 20); // controll
+
+    fseek(storage, starting_point, SEEK_SET);
+    while (starting_point < ending_point)
+    {
+        fread(ind, inode_size, 1, storage);
+
+        printf("------------\n");
+        printf("#: %d \n", i);                // jut a counter
+        printf("mode: %x \n", ind->mode);     // reg. file, directory, dev., permissions
+        printf("locked: %u \n", ind->locked); // opened for write
+        printf("date: %u \n", ind->date);
+        printf("size: %u \n", ind->size);
+        printf("indrct_blk: %d \n", ind->indirect_block); // N.B. -1 for NULL
+        printf("blocks: not implemented \n");               // unsigned short blocks[0x6];
+
+        starting_point += inode_size;
+        i++;
+    }
 }
 
 void read_input()
