@@ -32,7 +32,7 @@
 #define INODE_MODE_DIR_FILE		0x20000
 #define INODE_MODE_DEV_FILE		0x40000
 
-//data-entry(file) tipes
+//directory-entry(file) tipes
 #define DENTRY_TYPE_REG_FILE	0x1
 #define DENTRY_TYPE_DIR_FILE	0x2
 
@@ -43,7 +43,7 @@ struct super_block {
 	unsigned int inode_size;
 	unsigned int first_inode_block;
 
-	unsigned int num_inodes;
+	unsigned int num_inodes_tot;
 	unsigned int num_inode_blocks;
 	unsigned int num_free_inodes;
 	unsigned int num_blocks;
@@ -64,7 +64,8 @@ struct inode {
 	unsigned short blocks[0x6];
 };
 
-struct blocks {
+/* 1 KB of chars*/
+struct block {
 	unsigned char d[1024];
 };
 
@@ -72,17 +73,19 @@ struct blocks {
 struct partition {
 	struct super_block s;
 	struct inode inode_table[224];
-	struct blocks data_blocks[4088]; //4096-8
+	struct block data_blocks[4088]; //4096-8
 };
 
-/** Directory entry structure */
+/** Directory-entry structure */
 struct dentry {
 	unsigned int inode;
 	unsigned int dir_length;
 	unsigned int name_len;
 	unsigned int file_type;
-	union { // name
+	unsigned char name[16];
+	
+	/*union { // name
 		unsigned char name[255];
 		unsigned char n_pad[16][16];
-	};
+	};*/
 };
