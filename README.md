@@ -68,15 +68,15 @@ at boot-up of the system:
 1. mount the root filesystem (load i-node table)
 
 to open the file "/file1":
-1. look in the "/" directory-file to identify "file1"'s i-node 
-    1. i-node of "/" is previously determined.
-    2. In the "/" i-node, find out data blocks in the disk.
-    3. read data blocks into memory, and interpret data as directory-entry
-        1. parse all the data in the directory-file
-        2. identify files in "/" directory
-        3. compare the filename in directory-entry against "file1"
-    4. find the i-node number for "file1"
-        1. the directory-entry has i-node number
+1. look in the "/" directory-file to identify "file1"'s i-node
+    1. in the i-node table find the directory-file's i-node
+        * for "/" is 2
+    2. in the i-node, find data blocks corresponding to "/"
+    3. read data blocks into memory
+        1. cast data to directory-entries
+        2. compare directory-entry's filename against "file1"
+    4. find the directory-entry for "file1"
+        * the directory-entry has the i-node number
 2. mark i-node for "/file1" as opened
     1. additional data is initialized (file offset is set to zero, for supporting data stream)
 
@@ -88,10 +88,10 @@ to read data on "/file1":
     2. calculate the starting byte (in a file) to read
     3. calculate the starting logical block number (in a file)
     4. look up i-node to get the physical block number
-        1. i-node has blocks array that maps logical blocks to physical blocks (data blocknumber)
-    5. read in data blocks
+        1. i-node has blocks array that maps logical-blocks to physical-blocks (data blocknumber)
+    5. read in data-blocks
     6. copy it to the user buffer
-        1. calculate the first byte of data blocks
+        1. calculate the first byte of data-blocks
         2. copy of it
 
 ## Explanation
